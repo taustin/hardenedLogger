@@ -1,17 +1,19 @@
 require 'socket'
 
-puts "Starting the logger..."
+PORT = 9000
 
-i = 0
+file_name = ARGV[0]
 
-file = File.open("./access.log", "r")
+file = File.open(file_name, "r")
+puts "Parsing #{file_name}"
+
 while !file.eof?
   line = file.readline
-  socket = TCPSocket.new("localhost", 9000)
-  socket.write(rand(6).to_s + line)
+  socket = TCPSocket.new("localhost", PORT)
+  socket.write(rand(5).to_s + line)
   socket.close
   sleep(1)
-  i = i+1
 end
+
 file.close
 

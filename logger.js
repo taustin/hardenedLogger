@@ -5,7 +5,6 @@ const net = require('net');
 const { Blockchain, Block, Client, Transaction, FakeNet } = require('spartan-gold');
 
 const LoggingMiner = require('./logging-miner');
-const LoggingBlock = require('./logging-block');
 
 const DEBUG = 0;
 const INFO = 1;

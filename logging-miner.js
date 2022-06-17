@@ -44,6 +44,7 @@ module.exports = class LoggingMiner extends Miner {
       case 2: return "WARN";
       case 3: return "ERROR";
       case 4: return "FATAL";
+      case 5: return "BLOCK_TIME";
       default: return "UNKNOWN LOG LEVEL";
     }
   }
@@ -52,8 +53,10 @@ module.exports = class LoggingMiner extends Miner {
     block = super.receiveBlock(block);
     if (block === null) return null;
 
-    console.log(`***Block ${block.id}***`);
+    console.log(`{"${block.id}":`);
     console.log(block.serialize());
+    console.log("},");
+
     /*block.transactions.forEach((tx) => {
       let d = tx.data;
       let date = new Date(d.time);
