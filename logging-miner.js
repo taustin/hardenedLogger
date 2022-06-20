@@ -1,9 +1,24 @@
 "use strict";
 
 const { Blockchain, Block, Client, Miner, Transaction, FakeNet } = require('spartan-gold');
+const Transaction = require('spartan-gold/transaction');
 
+const BLOCK_TIME_LEVEL = 5;
+
+/**
+ * This miner makes blocks of transactions where every
+ * transaction is a logging message.
+ */
 module.exports = class LoggingMiner extends Miner {
 
+  /**
+   * This method is called whenever a new block is
+   * created.  For our logging framework, every block
+   * contains an additional transaction indicating
+   * the time when the search for the proof begins.
+   * 
+   * @param {Set<Transaction>} txSet 
+   */
   startNewSearch(txSet=new Set()) {
     super.startNewSearch(txSet);
     let tx = Blockchain.makeTransaction({
@@ -12,7 +27,7 @@ module.exports = class LoggingMiner extends Miner {
       pubKey: this.keyPair.public,
       outputs: [],
       data: {
-        level: 5,
+        level: BLOCK_TIME_LEVEL,
         time: Date.now(),
       },
     });
@@ -20,6 +35,14 @@ module.exports = class LoggingMiner extends Miner {
     this.currentBlock.addTransaction(tx);
   }
 
+  /**
+   * Writes a log message to a transaction and broadcasts it to
+   * the mining network.  (In our initial architecture, the miner
+   * is the only client and the only miner.)
+   * 
+   * @param {Number} level - Level of the logging message, ranging from 0-4.
+   * @param {String} message - The log message.
+   */
   postLoggingTransaction(level, message) {
     this.postGenericTransaction({
       outputs: [],
@@ -32,6 +55,7 @@ module.exports = class LoggingMiner extends Miner {
     });
   }
 
+  // Silencing the normal logging messages.
   log(msg) {
     //if (msg.startsWith("cutting") || msg.startsWith("found")) return;
     //super.log(msg);
@@ -49,6 +73,19 @@ module.exports = class LoggingMiner extends Miner {
     }
   }
 
+  /**
+   * This method validates the block of transactions
+   * (by calling the superclass's version of this method)
+   * and then prints out the block to standard output.
+   * 
+   * The format of the output is JSON, with an additional
+   * comma at the end.
+   * 
+   * @param {Block} block - Block of transactions.
+   * 
+   * @returns {Block} - The block of transactions, or null
+   *   if the block was invalid
+   */
   receiveBlock(block) {
     block = super.receiveBlock(block);
     if (block === null) return null;
@@ -56,13 +93,6 @@ module.exports = class LoggingMiner extends Miner {
     console.log(`{"${block.id}":`);
     console.log(block.serialize());
     console.log("},");
-
-    /*block.transactions.forEach((tx) => {
-      let d = tx.data;
-      let date = new Date(d.time);
-      let lvl = this.translateLevel(d.level);
-      console.log(`${tx.id} (${lvl} ${date.toISOString()}): ${d.message}`);
-    });*/
 
    return block;
   }

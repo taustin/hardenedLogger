@@ -15,12 +15,29 @@ const BLOCK_TIME = 5;
 
 const DEFAULT_POW_LEADING_ZEROES = 20;
 
+/**
+ * This class listens for logging messages, and then writes them
+ * to the blockchain by calling the LoggingMiner class.
+ */
 module.exports = class Logger {
+  
+  /**
+   * Configures the logger.
+   * 
+   * @param {Object} params - Configuration for the logger.
+   * @param {Number} params.level - Level of messages that should be printed out.
+   * @param {Number} params.powLeadingZeroes - Difficulty level of mining blocks.
+   */
   constructor({level=WARN, powLeadingZeroes=DEFAULT_POW_LEADING_ZEROES} = {}) {
     this.level = level;
     this.initializeBlockchain(powLeadingZeroes);
   }
 
+  /**
+   * Start the server to listen for messages.
+   * 
+   * @param {Number} port - Number of the port to listen to for incoming messages.
+   */
   startServer(port) {
     let srvr = net.createServer();
     srvr.on('connection', (client) => {
@@ -34,6 +51,11 @@ module.exports = class Logger {
     srvr.listen(port);
   }
 
+  /**
+   * Initializes the miner and blockchain.
+   * 
+   * @param {Number} powLeadingZeroes - Difficulty of finding blocks.
+   */
   initializeBlockchain(powLeadingZeroes) {
     let fakeNet = new FakeNet();
     this.miner = new LoggingMiner({name: "BlockLogger", net: fakeNet});
@@ -51,6 +73,13 @@ module.exports = class Logger {
     this.miner.initialize();
   }
 
+  /**
+   * Logs a message at the specified logging level.
+   * The logging levels loosely follow Log4J.
+   * 
+   * @param {Number} level - Logging level.
+   * @param {String} message - Message to be logged.
+   */
   log(level, message) {
     //if (this.level <= level) {
     //  console.log(level, ": ", message);
@@ -58,22 +87,47 @@ module.exports = class Logger {
     this.miner.postLoggingTransaction(level, message);
   }
 
+  /**
+   * Writes out a debug message.
+   * 
+   * @param {String} message - Logging message.
+   */
   debug(message) {
     this.log(DEBUG, message);
   }
 
+  /**
+   * Writes an informational message.
+   * 
+   * @param {String} message - Logging message.
+   */
   info(message) {
     this.log(INFO, message);
   }
 
+  /**
+   * Writes a warning message.
+   * 
+   * @param {String} message - Logging message.
+   */
   warn(message) {
     this.log(WARN, message);
   }
 
+  /**
+   * Writes an error message.
+   * 
+   * @param {String} message - Logging message.
+   */
   error(message) {
     this.log(ERROR, message);
   }
 
+  /**
+   * Writes a fatal error message.
+   * 
+   * @param {String} message - Logging message.
+   */
   fatal(message) {
     this.log(FATAL, message);
   }
