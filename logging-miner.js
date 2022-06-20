@@ -1,9 +1,12 @@
 "use strict";
 
 const { Blockchain, Block, Client, Miner, Transaction, FakeNet } = require('spartan-gold');
-const Transaction = require('spartan-gold/transaction');
 
+// The logging level for the block timestamp transaction.
 const BLOCK_TIME_LEVEL = 5;
+
+// The amount of time that the attacker is trying to rewrite.
+const ERASED_BLOCKS_DURATION = 5 * 60000;
 
 /**
  * This miner makes blocks of transactions where every
@@ -20,6 +23,18 @@ module.exports = class LoggingMiner extends Miner {
    * @param {Set<Transaction>} txSet 
    */
   startNewSearch(txSet=new Set()) {
+    if (!!this.compromisedBlockNumber) {
+      // Here we simulate an attacker attempting to delete
+      // or change history, and then needing to rewrite the
+      // corresponding blocks.
+      setTimeout(() => {
+        this.startNewSearch(txSet, ERASED_BLOCKS_DURATION);
+      });
+
+      // After the compromise, the blockchain continues as normal.
+      delete this.compromisedBlockNumber;
+    }
+
     super.startNewSearch(txSet);
     let tx = Blockchain.makeTransaction({
       from: this.address,
