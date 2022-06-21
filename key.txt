@@ -1,5 +1,9 @@
+(10 minute pause for compromised block)
+--
 blockchain-rewritten1.json -- block 382 is the start of the compromised section.
 blockchain-rewritten2.json -- block 401 is the start of the compromised section.
 blockchain-rewritten3.json -- block 858 is the start of the compromised section.
+blockchain-rewritten4.json -- block 886 is the start of the compromised section.
+blockchain-rewritten5.json -- block 814 is the start of the compromised section.
 
 
