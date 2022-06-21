@@ -28,10 +28,11 @@ module.exports = class Logger {
    * @param {Number} params.level - Level of messages that should be printed out.
    * @param {Number} params.powLeadingZeroes - Difficulty level of mining blocks.
    * @param {Number} params.compromisedBlockNumber - Number of the first rewritten block.
+   * @param {Number} params.compromisedBlockNumber - Length of delay for the compromised block.
    */
-  constructor({level=WARN, powLeadingZeroes=DEFAULT_POW_LEADING_ZEROES, compromisedBlockNumber} = {}) {
+  constructor({level=WARN, powLeadingZeroes=DEFAULT_POW_LEADING_ZEROES, compromisedBlockNumber, compromiseDuration} = {}) {
     this.level = level;
-    this.initializeBlockchain(powLeadingZeroes, compromisedBlockNumber);
+    this.initializeBlockchain(powLeadingZeroes, compromisedBlockNumber, compromiseDuration);
   }
 
   /**
@@ -57,9 +58,11 @@ module.exports = class Logger {
    * 
    * @param {Number} powLeadingZeroes - Difficulty of finding blocks.
    * @param {Number} compromisedBlockNumber - The number of the block after
-   *   an attack on the blockchain.  If unspecified, there is no attack.
+   *    an attack on the blockchain.  If unspecified, there is no attack.
+   * @param {Number} compromisedDuration - The number of milliseconds
+   *    of delay for the compromised block.
    */
-  initializeBlockchain(powLeadingZeroes, compromisedBlockNumber) {
+  initializeBlockchain(powLeadingZeroes, compromisedBlockNumber, compromiseDuration) {
     let fakeNet = new FakeNet();
     this.miner = new LoggingMiner({name: "BlockLogger", net: fakeNet});
 
@@ -75,6 +78,7 @@ module.exports = class Logger {
 
     // Set the compromised (first rewritten) block.
     this.miner.compromisedBlockNumber = compromisedBlockNumber;
+    this.miner.compromiseDuration = compromiseDuration;
 
     this.miner.initialize();
   }

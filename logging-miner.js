@@ -5,9 +5,6 @@ const { Blockchain, Block, Client, Miner, Transaction, FakeNet } = require('spar
 // The logging level for the block timestamp transaction.
 const BLOCK_TIME_LEVEL = 5;
 
-// The amount of time that the attacker is trying to rewrite.
-const ERASED_BLOCKS_DURATION = 5 * 60000;
-
 /**
  * This miner makes blocks of transactions where every
  * transaction is a logging message.
@@ -23,16 +20,17 @@ module.exports = class LoggingMiner extends Miner {
    * @param {Set<Transaction>} txSet 
    */
   startNewSearch(txSet=new Set()) {
-    if (!!this.compromisedBlockNumber) {
+    if (!!this.currentBlock && this.compromisedBlockNumber === this.currentBlock.chainLength) {
       // Here we simulate an attacker attempting to delete
       // or change history, and then needing to rewrite the
       // corresponding blocks.
       setTimeout(() => {
-        this.startNewSearch(txSet, ERASED_BLOCKS_DURATION);
-      });
+        this.startNewSearch(txSet);
+      }, this.compromiseDuration);
 
       // After the compromise, the blockchain continues as normal.
       delete this.compromisedBlockNumber;
+      return;
     }
 
     super.startNewSearch(txSet);
