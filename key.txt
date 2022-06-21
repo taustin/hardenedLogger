@@ -1,0 +1,5 @@
+blockchain-rewritten1.json -- block 382 is the start of the compromised section.
+blockchain-rewritten2.json -- block 401 is the start of the compromised section.
+blockchain-rewritten3.json -- block 858 is the start of the compromised section.
+
+
